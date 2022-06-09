@@ -1,0 +1,78 @@
+.selector {
+    --item-height: 20px;
+    font-size: 13px;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: var(--item-height);
+    margin: 0px 0.5em;
+    padding: 0px;
+    outline: none;
+    overflow: visible;
+}
+.selector > span, .selector > div a {
+    display: flex;
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: var(--item-height);
+    margin: 0px;
+
+    border: none;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.selector > span {
+    grid-column-start: 1;
+    grid-row-start: 1;
+    padding: 0px 0.5em;
+    color: inherit;
+    background: none;
+    outline: none;
+    cursor: pointer;
+}
+.selector > span .arrow {
+    margin-right: 0.5em;
+    border-color: inherit;
+}
+
+.selector > div {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    margin: 0px;
+    padding: 0px;
+    max-height: 100vh;
+    
+    background: var(--color-background);
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 2;
+
+    visibility: hidden;
+
+    box-shadow: 0.05em 0.05em 0.25em rgba(0,0,0, 0.5);
+}
+.selector > div a {
+    padding: 0px 1.25em;
+    color: var(--color-text);
+    background: var(--color-background);
+    text-decoration: none;
+    outline: none;
+    transition: filter 0.15s ease;
+}
+.selector > div a:hover, .selector > div a:focus {
+    filter: brightness(93%);
+}
+
+.selector > button:focus ~ div, .selector:focus-within > div {
+    visibility: visible;
+}

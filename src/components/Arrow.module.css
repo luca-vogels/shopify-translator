@@ -1,0 +1,22 @@
+.arrow {
+    display: block;
+    width: 0.3em;
+    height: 0.3em;
+    margin: 0px;
+    padding: 0px;
+    border-color: var(--color-text);
+    transform-origin: 100% 50%;
+}
+.arrow::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    border-style: solid solid none none;
+    border-width: 0.15em;
+    border-color: inherit;
+    border-radius: 0.125em 0.1em 0.125em 0px;
+    transform: rotate(45deg);
+}

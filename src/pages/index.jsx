@@ -7,7 +7,7 @@ export default function Home({LANGUAGE_NAMES, TEXT}){
         <>
             <Metadata LANGUAGE_NAMES={LANGUAGE_NAMES} TEXT={TEXT} title={TEXT['NAME']} description={TEXT['pageDescriptionIndex']} 
                 keywords={TEXT['pageKeywordsIndex']} longTitle={TEXT['pageLongTitleIndex']} allowIndex={true}></Metadata>
-            <Layout TEXT={TEXT}>
+            <Layout LANGUAGE_NAMES={LANGUAGE_NAMES} TEXT={TEXT}>
                 
             </Layout>
         </>
