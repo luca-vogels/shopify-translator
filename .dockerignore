@@ -3,6 +3,7 @@
 bin/__tests__/
 node_modules/
 src/
+uploads/
 .dockerignore
 .eslintrc.json
 .gitignore

@@ -1,6 +1,9 @@
 {
+    "CouldNotParseCSV": "Could not parse CSV file",
     "NAME": "Shopify Translator",
     "pageDescriptionIndex": "Editor for easier editing of Shopify language CSV files",
     "pageKeywordsIndex": "Shopify,Translator,Editor,CSV,Online",
-    "pageLongTitleIndex": "Shopify Translator"
+    "pageLongTitleIndex": "Shopify Translator",
+    "ReuploadFile": "Please upload the file again",
+    "Upload": "Upload"
 }

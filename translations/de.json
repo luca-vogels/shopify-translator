@@ -1,6 +1,9 @@
 {
+    "CouldNotParseCSV": "Konnte CSV-Datei nicht einlesen",
     "NAME": "Shopify Übersetzer",
     "pageDescriptionIndex": "Editor zum einfachen bearbeiten von Shopify CSV-Sprachdateien",
     "pageKeywordsIndex": "Shopify,Übersetzer,Editor,CSV,Online",
-    "pageLongTitleIndex": "Shopify Übersetzer"
+    "pageLongTitleIndex": "Shopify Übersetzer",
+    "ReuploadFile": "Bitte die Datei neu hochladen",
+    "Upload": "Hochladen"
 }
