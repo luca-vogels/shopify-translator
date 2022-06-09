@@ -1,0 +1,42 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.layout > header {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 0.25em 0.5em;
+}
+.layout > header h1 {
+    margin: 0px;
+    padding: 0px;
+    font-size: 1.8rem;
+}
+
+.layout > .main {
+    flex: 1 1 auto;
+}
+
+.layout > footer {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0.5em 0.5em 0.1em;
+}
+.layout > footer a {
+    color: inherit;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+.layout > footer a:hover, .layout > footer a:focus-visible {
+    opacity: 0.95;
+}

@@ -1,0 +1,32 @@
+{
+  "name": "shopify-translator",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "rm -rf .next && npx tsc && node ./bin/server.js",
+    "build": "rm -rf .next && npx tsc && next build",
+    "start": "node ./bin/server.js --production",
+    "docker": "npm run build && docker build -t lupauth-website . && docker run -it --rm --name lupauth-website -p 80:80 -e NODE_ENV=production lupauth-website"
+  },
+  "dependencies": {
+    "@svgr/webpack": "^6.2.1",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "fs": "^0.0.1-security",
+    "lup-language": "^1.8.3",
+    "multer": "^1.4.4",
+    "next": "12.1.4",
+    "react": "18.0.0",
+    "react-dom": "18.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^17.0.31",
+    "@types/react": "^17.0.44",
+    "@types/react-dom": "^18.0.3",
+    "eslint": "8.12.0",
+    "eslint-config-next": "12.1.4",
+    "typescript": "^4.6.4"
+  }
+}

@@ -1,0 +1,34 @@
+name: On Push
+on: [push]
+jobs:
+  deploy:
+    name: Building & Deploy
+    runs-on: Linux
+    env:
+      NODE_ENV: development
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checking out repository
+        uses: actions/checkout@v3
+      - name: "Setup Node"
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Installing 
+        run: npm install -save --save-dev
+      - name: Building
+        run: npm run build
+
+      - name: Creating Docker image
+        run: docker build -t shopify-translator .
+
+      - name: Stop and remove current container
+        run:  docker rm -f shopify-translator
+      - name: Start new container
+        run:  docker run -d --name shopify-translator --restart=always -p 6230:80 shopify-translator
+      - name: Done
+        run: exit 0
+      - name: Done
+        run: exit 0

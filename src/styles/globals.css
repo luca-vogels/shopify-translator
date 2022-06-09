@@ -1,0 +1,68 @@
+:root {
+  --color-background: #fff;
+  --color-text: #242729;
+
+  --color-footer-background: #5f6970;
+  --color-footer-text: #fff;
+
+  --color-border: #8d8d8d;
+  --color-critical: #e32222;
+  --color-warning: #ff8e2b;
+  --color-success: var(--color-accent-1);
+
+  --header-height: 50px;
+
+  --font-text: 'text-font', sans-serif;
+}
+
+
+@font-face {
+  font-family: 'text-font';
+  src: url('./fonts/OpenSans.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+html,
+body {
+  margin: 0px;
+  padding: 0px;
+  font-family: var(--font-text);
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.noselect {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.nodrag {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+a, button, .focus-outline {
+  outline-style: solid;
+  outline-width: 1px;
+  outline-color: transparent;
+  outline-offset: 0px;
+  border-radius: 0.25em;
+  padding: 0.1em 0.35em;
+}
+a:focus-visible, button:focus-visible, .focus-outline:focus-visible {
+  outline-color: var(--color-text);
+}
