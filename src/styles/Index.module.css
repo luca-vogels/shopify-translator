@@ -1,0 +1,70 @@
+.controlls {
+    display: inline-flex;
+    flex-direction: column;
+    padding: 1em;
+    border-radius: 0.5em;
+    box-shadow: 1px 1px 3px rgba(0,0,0, 0.5);
+}
+
+.controlls > form {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding-top: 2.5em;
+}
+.controlls > form button {
+    margin-top: 1em;
+    cursor: pointer;
+}
+
+.error {
+    width: 100%;
+    padding: 0px 0px 1em;
+    color: var(--color-critical);
+    text-align: center;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    max-width: 100vw;
+
+    overflow: hidden;
+}
+
+/* Title container that holds multiple field containers */
+.list > div {
+    display: flex;
+    flex-direction: column;
+    padding: 0px 0px 3em 0px;
+}
+
+.list > div > h3 {
+    display: flex;
+    align-items: center;
+    margin: 0px;
+    padding: 0px;
+    font-size: 1.2rem;
+}
+.list > div > h3 small {
+    padding-left: 0.75em;
+    font-size: 0.7rem;
+}
+
+/* Multiple field containers inside title container */
+.list > div > div {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5em 0px 0px 1em;
+}
+
+/* TextAreas */
+.list > div > div > div {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+}

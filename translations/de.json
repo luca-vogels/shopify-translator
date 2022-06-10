@@ -1,9 +1,18 @@
 {
+    "Auto": "Auto",
     "CouldNotParseCSV": "Konnte CSV-Datei nicht einlesen",
+    "Default": "Standard",
+    "Edit": "Bearbeiten",
+    "Lock": "Sperren",
     "NAME": "Shopify Übersetzer",
     "pageDescriptionIndex": "Editor zum einfachen bearbeiten von Shopify CSV-Sprachdateien",
     "pageKeywordsIndex": "Shopify,Übersetzer,Editor,CSV,Online",
     "pageLongTitleIndex": "Shopify Übersetzer",
+    "ResetToDefault": "Zurücksetzen",
     "ReuploadFile": "Bitte die Datei neu hochladen",
+    "SelectFile": "Datei auswählen",
+    "Settings": "Einstellungen",
+    "TargetLanguage": "Zielsprache",
+    "Translation": "Übersetzung",
     "Upload": "Hochladen"
 }

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="20"
+   height="20"
+   viewBox="0 0 20 20"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="lock.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     showgrid="false"
+     inkscape:showpageshadow="false"
+     inkscape:zoom="29.132799"
+     inkscape:cx="6.7106493"
+     inkscape:cy="8.9074859"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6" />
+  <title
+     id="title2">
+    lock
+  </title>
+  <path
+     d="M 15.7665,8.1 H 14.75 V 5.25 c 0,0 0,-4.75 -4.75,-4.75 -4.75,0 -4.75,4.75 -4.75,4.75 V 8.1 H 4.2335 A 1.8335,1.8335 0 0 0 2.4,9.9335 V 17.676 A 1.8335,1.8335 0 0 0 4.2335,19.5 h 11.533 A 1.8335,1.8335 0 0 0 17.6,17.6665 V 9.9335 A 1.8335,1.8335 0 0 0 15.7665,8.1 Z M 10,15.7 A 1.9,1.9 0 1 1 11.9,13.8 1.9,1.9 0 0 1 10,15.7 Z M 12.85,8.1 H 7.15 V 5.725 C 7.15,4.3 7.15,2.4 10,2.4 c 2.85,0 2.85,1.9 2.85,3.325 z"
+     id="path4"
+     style="stroke-width:0.95" />
+  <metadata
+     id="metadata831">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>
+    lock
+  </dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

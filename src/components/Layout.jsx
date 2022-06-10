@@ -28,4 +28,8 @@ Layout.addTranslationKeys = function(set){
     [ // used translation keys
         'NAME'
     ].forEach((value) => set.add(value));
+
+    [ // used components
+        LanguageSelector
+    ].forEach((component) => component.addTranslationKeys(set));
 }
