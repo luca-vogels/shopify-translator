@@ -19,14 +19,25 @@ const AI_SUPPORT = false; // TODO
 // TODO Button to hide all empty fields
 
 
-export default function Home({LANGUAGE_NAMES, TEXT, fileContent, errorKey}){
+export default function Home({LANGUAGE_NAMES, TEXT, fileName, fileContent, errorKey}){
     const [csvState, setCsvState] = useState({});
-    const refLanguage = useRef(null);
+    const [targetLang, setTargetLang] = useState("EN");
 
-    errorKey = errorKey ? <b className={styles.error}>{TEXT[errorKey]}</b> : null;
+    errorKey = (errorKey && csvState.progress === undefined) ? <b className={styles.error}>{TEXT[errorKey]}</b> : null;
     
     useEffect(() => {
-        
+
+        // load from local storage
+        if(csvState.progress === undefined && fileName && !fileContent && localStorage && localStorage.getItem("fileName") === fileName){
+            try {
+                setCsvState({
+                    lines: JSON.parse(localStorage.getItem("lines")),
+                    progress: 1.0
+                });
+                errorKey = null;
+            } catch (ex){}
+        }
+
         // process CSV file
         if(fileContent && csvState.progress === undefined) CSV.parseCSV(fileContent, (progress, lines) => {
             setCsvState({progress, lines});
@@ -90,25 +101,40 @@ export default function Home({LANGUAGE_NAMES, TEXT, fileContent, errorKey}){
             pushComponent(csvState.lines.length);
     
             setCsvState({ progress: csvState.progress, lineElements });
+            if(localStorage){
+                localStorage.setItem("fileName", fileName);
+                localStorage.setItem("lines", JSON.stringify(csvState.lines));
+            }
         }
     });
 
+
+    // Controlls
     const controlls = csvState.lineElements ? (
+
+        // Settings
         <>
             <h2>{TEXT['Settings']}</h2>
             {errorKey}
             <label>
                 {TEXT['TargetLanguage']}
-                <input type="text" ref={refLanguage} />
+                <input type="text" size="1" value={targetLang} onChange={(event) => {
+                    setTargetLang(event.target.value.substring(0, 2).toUpperCase());
+                }} />
             </label>
         </>
+
     ) : ( csvState.progress !== undefined ? (
+
+        // Progress bar
         <>
             <b>{TEXT['ProcessingFile']}</b>
-            <span>{csvState.progress * 100}% / 100%</span>
             <progress value={Math.floor(csvState.progress * 100)} max={100}>{Math.floor(csvState.progress * 100)}%</progress>
         </>
+
     ) : (
+
+        // Upload form
         <form method="POST" action="/upload" encType="multipart/form-data">
             {errorKey}
             <h2>{TEXT['UploadYourShopifyCSV']}</h2>
@@ -118,6 +144,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, fileContent, errorKey}){
     ));
 
 
+    // HTML
     return (
         <>
             <Metadata LANGUAGE_NAMES={LANGUAGE_NAMES} TEXT={TEXT} title={TEXT['NAME']} description={TEXT['pageDescriptionIndex']} 
@@ -171,6 +198,7 @@ export async function getServerSideProps(context){
         props: {
             LANGUAGE_NAMES: await getLanguageNames(),
             TEXT,
+            fileName,
             fileContent,
             errorKey
         }
