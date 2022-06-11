@@ -11,8 +11,13 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    padding-top: 2.5em;
+}
+.controlls > form h2 {
+    max-width: 35ch;
+    margin: 0px;
+    padding: 1em 0px 1.5em;
+    font-size: 1rem;
+    text-align: center;
 }
 .controlls > form button {
     margin-top: 1em;

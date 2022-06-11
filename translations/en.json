@@ -8,11 +8,13 @@
     "pageDescriptionIndex": "Editor for easier editing of Shopify language CSV files",
     "pageKeywordsIndex": "Shopify,Translator,Editor,CSV,Online",
     "pageLongTitleIndex": "Shopify Translator",
+    "ProcessingFile": "Processing file",
     "ResetToDefault": "Reset to default",
     "ReuploadFile": "Please upload the file again",
     "SelectFile": "Select a file",
     "Settings": "Settings",
     "TargetLanguage": "Target language",
     "Translation": "Translation",
-    "Upload": "Upload"
+    "Upload": "Upload",
+    "UploadYourShopifyCSV": "Upload your Shopify CSV language file to start editing"
 }

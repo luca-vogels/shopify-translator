@@ -8,11 +8,13 @@
     "pageDescriptionIndex": "Editor zum einfachen bearbeiten von Shopify CSV-Sprachdateien",
     "pageKeywordsIndex": "Shopify,Übersetzer,Editor,CSV,Online",
     "pageLongTitleIndex": "Shopify Übersetzer",
+    "ProcessingFile": "Datei wird verarbeitet",
     "ResetToDefault": "Zurücksetzen",
     "ReuploadFile": "Bitte die Datei neu hochladen",
     "SelectFile": "Datei auswählen",
     "Settings": "Einstellungen",
     "TargetLanguage": "Zielsprache",
     "Translation": "Übersetzung",
-    "Upload": "Hochladen"
+    "Upload": "Hochladen",
+    "UploadYourShopifyCSV": "Laden Sie Ihre Shopify CSV-Sprachdatei hoch, um mit dem Bearbeiten zu beginnen"
 }

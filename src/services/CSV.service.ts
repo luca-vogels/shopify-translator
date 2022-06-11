@@ -1,10 +1,13 @@
 import Upload from "./Upload.service";
 
-const parseCSV = function(content: string): string[][] {
+const parseCSV = function(content: string, callback: (progress: number, lines: string[][] | null) => void, steps=100): void {
     const lines: string[][] = [];
     let currentCols: string[] = [];
     let current = "";
     let append = false;
+
+    callback(0.0, null);
+    let lastCallback = 0;
 
     for(let i=0; i < content.length; i++){
         const c = content[i];
@@ -42,24 +45,18 @@ const parseCSV = function(content: string): string[][] {
             
             default: current += c;
         }
+
+        let nextCallback = Math.floor(i * steps / content.length);
+        if(steps > 0 && nextCallback > lastCallback){
+            lastCallback = nextCallback;
+            callback(i / content.length, null);
+        }
     }
 
-    return lines;
+    callback(1.0, lines);
 }
-
-
-/**
- * 
- * @param fileName 
- * @returns Lines with columns or null if file does not exist
- */
-const parseCSVFile = async function(fileName: string): Promise<string[][] | null> {
-    return Upload.readFile(fileName).then((content) => content ? parseCSV(content) : null);
-}
-
 
 
 export default {
     parseCSV,
-    parseCSVFile
 }
