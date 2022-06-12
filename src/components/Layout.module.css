@@ -14,6 +14,10 @@
     width: 100%;
     padding: 0.25em 0.5em;
 }
+.layout > header a {
+    color: inherit;
+    text-decoration: none;
+}
 .layout > header h1 {
     margin: 0px;
     padding: 0px;

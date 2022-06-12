@@ -1,11 +1,10 @@
-import Image from "next/image";
 import LanguageSelector from "./LanguageSelector";
 import styles from "./Layout.module.css";
 
 export default function Layout({children, LANGUAGE_NAMES, TEXT}){
     return (
         <div className={styles.layout}>
-            <header><h1>{TEXT['NAME']}</h1></header>
+            <header><a href="/" className="nodrag noselect"><h1>{TEXT['NAME']}</h1></a></header>
             <div className={styles.main}>
                 {children}
             </div>

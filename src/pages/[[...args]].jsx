@@ -112,9 +112,9 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
     
             setCsvState({ progress: csvState.progress, lineElements });
             if(localStorage){
-                localStorage.setItem("fileName", fileName);
-                localStorage.setItem("originalFileName", originalFileName);
-                localStorage.setItem("lines", JSON.stringify(csvState.lines));
+                if(fileName) localStorage.setItem("fileName", fileName);
+                if(originalFileName) localStorage.setItem("originalFileName", originalFileName);
+                if(csvState.lines) localStorage.setItem("lines", JSON.stringify(csvState.lines));
             }
         }
     });
@@ -156,7 +156,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
                 }} />
             </label>
             <label>
-                <span>{TEXT['NewFileName']}</span>
+                <span>{TEXT['FileName']}</span>
                 <input type="text" value={newFileName} required onChange={(event) => {
                     setNewFileName(event.target.value);
                 }} />
@@ -212,8 +212,8 @@ export async function getServerSideProps(context){
 
     const translationKeys = new Set();
     [ // used translation keys
-        'CouldNotParseCSV', 'Default', 'Download', 'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 'ProcessingFile',
-        'ReuploadFile', 'Settings', 'TargetLanguage', 'Translation', 'Upload', 'UploadYourShopifyCSV'
+        'CouldNotParseCSV', 'Default', 'Download', 'FileName', 'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 
+        'ProcessingFile', 'ReuploadFile', 'Settings', 'TargetLanguage', 'Translation', 'Upload', 'UploadYourShopifyCSV'
     ].forEach((value) => translationKeys.add(value));
 
     [ // used components

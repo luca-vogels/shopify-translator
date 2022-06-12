@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./InputFile.module.css";
 
-export default function InputFile({TEXT, className, style, name, accept, required, color="#82bf9e", border="#55806a", onChange}){
+export default function InputFile({TEXT, className, style, name, accept, required, color="#82bf9e", dashedColor="#55806a", onChange}){
     const [fileName, setFileName] = useState(null);
     const refInput = useRef(null);
     
@@ -10,10 +10,9 @@ export default function InputFile({TEXT, className, style, name, accept, require
     style = style || {};
     if(color){
         style.backgroundColor = color;
-        style.outlineColor = color;
     }
-    if(border){
-        style.borderColor = border;
+    if(dashedColor){
+        style.outlineColor = dashedColor;
     }
 
     const handleOnChange = function(event){
