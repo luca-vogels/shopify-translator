@@ -161,7 +161,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
     const controlls = csvState.lineElements ? (
 
         // Settings
-        <>
+        <div className={styles.settings}>
             <h2>{TEXT['Settings']}</h2>
             {errorKey}
             <label style={{cursor: "pointer"}}>
@@ -206,7 +206,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
                 }} />
             </label>
             <Button ref={refDownload} type="button" onClick={buildFileAndDownload}>{TEXT['Download']}</Button>
-        </>
+        </div>
 
     ) : ( csvState.progress !== undefined ? (
 

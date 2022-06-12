@@ -24,6 +24,36 @@
     cursor: pointer;
 }
 
+
+
+
+.controlls > .settings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.controlls > .settings label {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+.controlls > .settings label > span {
+    min-width: 100px;
+    padding-right: 0.5em;
+}
+
+.controlls > .settings button {
+    margin: 1.5em 0px 0px;
+    padding: 0.2em 0.5em;
+    font-size: 1.05rem;
+}
+
+
+
+
 .error {
     width: 100%;
     padding: 0px 0px 1em;
@@ -37,7 +67,7 @@
     align-items: stretch;
 
     max-width: 100vw;
-
+    margin-top: 3em;
     overflow: hidden;
 }
 
