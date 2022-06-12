@@ -14,6 +14,7 @@ export default function TextArea({TEXT, children: initialValue, defaultValue, na
     const [value, setValue] = useState(initialValue);
     const [readOnly, setReadOnly] = useState(disabled ? true : false);
     const [aiState, setAiState] = useState(AI_NONE);
+    let isButtonPressed = false;
 
     const handleChange = function(event){
         if(readOnly) return;
@@ -22,9 +23,17 @@ export default function TextArea({TEXT, children: initialValue, defaultValue, na
         if(onChange) onChange(event);
     }
 
+    const handleBlur = function(event){
+        setTimeout(() => {
+            event.isButtonPressed = isButtonPressed;
+            onBlur(event);
+        }, 100);
+    }
+
     // Reset button
     const resetButton = (butReset && value !== initialValue) ? (
         <Button type="button" title={TEXT['ResetToDefault']} disabled={readOnly} onClick={(event) => {
+            isButtonPressed = true;
             setValue(initialValue);
         }}>
             <img src="/images/content/icons/reset.svg" width="100%" height="100%" draggable={false} alt={TEXT['ResetToDefault']} />
@@ -63,7 +72,7 @@ export default function TextArea({TEXT, children: initialValue, defaultValue, na
                 {editButton}
                 {aiButton}
             </div>
-            <textarea name={name} value={value} onChange={handleChange}  onBlur={onBlur} disabled={readOnly} />
+            <textarea name={name} value={value} onChange={handleChange} onBlur={handleBlur} disabled={readOnly} />
         </div>
     );
 }

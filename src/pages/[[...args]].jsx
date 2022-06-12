@@ -23,13 +23,94 @@ const AI_SUPPORT = false; // TODO
 export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, fileContent, errorKey}){
     const refDownload = useRef(null);
     const [csvState, setCsvState] = useState({});
+    const [showAlready, setShowAlready] = useState(true);
+    const [showEmpty, setShowEmpty] = useState(true);
     const [targetLang, setTargetLang] = useState("EN");
     const [newFileName, setNewFileName] = useState(originalFileName || fileName);
 
     errorKey = (errorKey && csvState.progress === undefined) ? <b className={styles.error}>{TEXT[errorKey]}</b> : null;
     
+
+    const updateLineElements = function(){
+        const lineElements = [];
+        let typeIdx = 0, idIdx = 1, fieldIdx = 2, localeIdx = 3, statusIdx = 5, defaultIdx = 6, translatedIdx = 7, foundHeader=0;
+
+        // reading header
+        for(let i=0; i < csvState.lines[0].length; i++){
+            const col = csvState.lines[0][i].trim().toLowerCase();
+            if(col === "type"){ typeIdx = i; foundHeader = 1; } else 
+            if(col.startsWith("id")){ idIdx = i; } else 
+            if(col.startsWith("field")){ fieldIdx = i; foundHeader = 1; } else
+            if(col.startsWith("locacle")){ localeIdx = i; foundHeader = 1; } else
+            if(col.startsWith("status")){ statusIdx = i; foundHeader = 1; } else 
+            if(col.indexOf("content") >= 0){
+                if(col.indexOf("translate") >= 0) translatedIdx = i; else defaultIdx = i;
+                foundHeader = 1;
+            } 
+        }
+
+        const minCols = Math.max(typeIdx, idIdx, fieldIdx, localeIdx, statusIdx, defaultIdx, translatedIdx)+1;
+
+        let currentTitleKey = null, currentTitle = null, currentArr = [];
+
+        // builds title block with multiple field blocks
+        function pushComponent(c){
+            if(currentArr.length === 0) return;
+            const allHidden = currentArr.reduce((bool, ele) => bool && ele.props.hidden, true);
+            lineElements.push(
+                <div key={c} style={allHidden ? {display: "none"} : {}}>
+                    {currentTitle}
+                    {currentArr}
+                </div>
+            );
+            currentArr = [];
+        }
+
+        // iterate all lines except first one if header found
+        for(let c=foundHeader; c < csvState.lines.length; c++){
+            const column = csvState.lines[c]; while(column.length < minCols) column.push("");
+
+            const titleKey = column[typeIdx]+"-"+column[idIdx];
+            if(titleKey !== currentTitleKey){ pushComponent(c); }
+            currentTitleKey = titleKey;
+            currentTitle = <h3>{column[typeIdx]} <small>({column[idIdx]})</small></h3>;
+
+            // add field block to current title block
+            const transEmpty = !column[translatedIdx] || column[translatedIdx].length === 0;
+            const hidden = (!showEmpty && transEmpty && (!column[defaultIdx] || column[defaultIdx].length === 0)) ||
+                            (!showAlready && !transEmpty);
+            currentArr.push(
+                <div key={c} hidden={hidden} style={hidden ? {display: "none"} : {}}>
+                    <b>{column[fieldIdx]}</b>
+                    <div>
+                        <TextArea TEXT={TEXT} title={TEXT['Default']} butReset={true} butEdit={true} disabled onBlur={(event) => {
+                            csvState.lines[c][defaultIdx] = event.target.value;
+                            if(localStorage) localStorage.setItem("lines", JSON.stringify(csvState.lines));
+                            if(!showEmpty && !event.isButtonPressed) updateLineElements();
+                        }}>
+                            {column[defaultIdx]}
+                        </TextArea>
+                        <TextArea TEXT={TEXT} title={TEXT['Translation']} defaultValue={column[defaultIdx]} butReset={true} butAI={AI_SUPPORT} onBlur={(event) => {
+                            csvState.lines[c][translatedIdx] = event.target.value;
+                            if(localStorage) localStorage.setItem("lines", JSON.stringify(csvState.lines));
+                            if(!showAlready && !event.isButtonPressed) updateLineElements();
+                        }}>
+                            {column[translatedIdx]}
+                        </TextArea>
+                    </div>
+                </div>
+            );
+        }
+        pushComponent(csvState.lines.length);
+
+        setCsvState({ progress: csvState.progress, lineElements, lines: csvState.lines });
+    }
+
+
+
     // Process CSV
     useEffect(() => {
+
 
         // load from local storage
         if(csvState.progress === undefined && fileName && localStorage && localStorage.getItem("fileName") === fileName){
@@ -45,72 +126,16 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
             } catch (ex){}
         }
 
+
         // process CSV file
         if(fileContent && csvState.progress === undefined) CSV.parseCSV(fileContent, (progress, lines) => {
             setCsvState({progress, lines});
         }, 10);
 
+
         // render lines
         if(csvState.lines && csvState.lineElements === undefined){
-            const lineElements = [];
-            let typeIdx = 0, idIdx = 1, fieldIdx = 2, localeIdx = 3, statusIdx = 5, defaultIdx = 6, translatedIdx = 7, foundHeader=0;
-    
-            // reading header
-            for(let i=0; i < csvState.lines[0].length; i++){
-                const col = csvState.lines[0][i].trim().toLowerCase();
-                if(col === "type"){ typeIdx = i; foundHeader = 1; } else 
-                if(col.startsWith("id")){ idIdx = i; } else 
-                if(col.startsWith("field")){ fieldIdx = i; foundHeader = 1; } else
-                if(col.startsWith("locacle")){ localeIdx = i; foundHeader = 1; } else
-                if(col.startsWith("status")){ statusIdx = i; foundHeader = 1; } else 
-                if(col.indexOf("content") >= 0){
-                    if(col.indexOf("translate") >= 0) translatedIdx = i; else defaultIdx = i;
-                    foundHeader = 1;
-                } 
-            }
-    
-            const minCols = Math.max(typeIdx, idIdx, fieldIdx, localeIdx, statusIdx, defaultIdx, translatedIdx)+1;
-    
-            let currentTitle = null, currentArr = [];
-    
-            function pushComponent(c){
-                if(currentArr.length === 0) return;
-                lineElements.push(
-                    <div key={c}>
-                        {currentTitle}
-                        {currentArr}
-                    </div>
-                );
-                currentArr = [];
-            }
-    
-            // iterate all lines except first one if header found
-            for(let c=foundHeader; c < csvState.lines.length; c++){
-                const column = csvState.lines[c]; while(column.length < minCols) column.push("");
-                const title = <h3>{column[typeIdx]} <small>({column[idIdx]})</small></h3>;
-                if(title !== currentTitle) pushComponent(c);
-                currentTitle = title;
-    
-                currentArr.push(
-                    <div key={c}>
-                        <b>{column[fieldIdx]}</b>
-                        <div>
-                            <TextArea TEXT={TEXT} title={TEXT['Default']} butReset={true} butEdit={true} disabled onBlur={(event) => {
-                                csvState.lines[c][defaultIdx] = event.target.value;
-                                if(localStorage) localStorage.setItem("lines", JSON.stringify(csvState.lines));
-                            }}>
-                                {column[defaultIdx]}
-                            </TextArea>
-                            <TextArea TEXT={TEXT} title={TEXT['Translation']} defaultValue={column[defaultIdx]} butReset={true} butAI={AI_SUPPORT}>
-                                {column[translatedIdx]}
-                            </TextArea>
-                        </div>
-                    </div>
-                );
-            }
-            pushComponent(csvState.lines.length);
-    
-            setCsvState({ progress: csvState.progress, lineElements });
+            updateLineElements();
             if(localStorage){
                 if(fileName) localStorage.setItem("fileName", fileName);
                 if(originalFileName) localStorage.setItem("originalFileName", originalFileName);
@@ -133,8 +158,21 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
         <>
             <h2>{TEXT['Settings']}</h2>
             {errorKey}
+            <label style={{cursor: "pointer"}}>
+                <input type="checkbox" onChange={() => {
+                    const next = !showAlready; setShowAlready(next); showAlready=next; updateLineElements(); 
+                } } checked={showAlready} />
+                <span>{TEXT['ShowAlreadyTranslatedFields']}</span>
+            </label>
+            <label style={{cursor: "pointer"}}>
+                <input type="checkbox" onChange={() => { 
+                    const next = !showEmpty; setShowEmpty(next); showEmpty=next; updateLineElements();
+                 }} checked={showEmpty} />
+                <span>{TEXT['ShowFieldsWithEmptyDefault']}</span>
+            </label>
+            <br />
             <label>
-                <span>{TEXT['TargetLanguage']}</span>
+                <span>{TEXT['TargetLanguage']}:</span>
                 <datalist id="language-codes">{
                     [   
                         'ab','aa','af','ak','sq','am','ar','an','hy','as','av','ae','ay','az','bm','ba','eu',
@@ -156,7 +194,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
                 }} />
             </label>
             <label>
-                <span>{TEXT['FileName']}</span>
+                <span>{TEXT['FileName']}:</span>
                 <input type="text" value={newFileName} required onChange={(event) => {
                     setNewFileName(event.target.value);
                 }} />
@@ -213,7 +251,8 @@ export async function getServerSideProps(context){
     const translationKeys = new Set();
     [ // used translation keys
         'CouldNotParseCSV', 'Default', 'Download', 'FileName', 'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 
-        'ProcessingFile', 'ReuploadFile', 'Settings', 'TargetLanguage', 'Translation', 'Upload', 'UploadYourShopifyCSV'
+        'ProcessingFile', 'ReuploadFile', 'Settings', 'ShowAlreadyTranslatedFields', 'ShowFieldsWithEmptyDefault',
+        'TargetLanguage', 'Translation', 'Upload', 'UploadYourShopifyCSV'
     ].forEach((value) => translationKeys.add(value));
 
     [ // used components
