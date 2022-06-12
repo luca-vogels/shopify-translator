@@ -20,7 +20,7 @@ class Button extends React.Component {
             <button className={styles.button+(this.state.loading ? " "+styles.loading  : "")+
                                                 (this.props.className ? " "+this.props.className : "")} 
                     type={this.props.type} name={this.props.name} title={this.props.title} style={this.props.style}
-                    disabled={this.props.disabled} onClick={this.props.onClick}>
+                    disabled={this.props.disabled || this.state.loading} onClick={this.props.onClick}>
                         {this.props.children}
             </button>
         );

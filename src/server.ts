@@ -12,7 +12,14 @@ const dev = Config.isDevMode();
 const HTTP_PORT = parseInt(process.env.HTTP_PORT || "") || 80;
 const HTTP_BIND = process.env.HTTP_BIND || "0.0.0.0";
 
-Upload.init();
+
+// intervals
+const interval = function(){
+    Upload.freeStorage();
+}
+interval(); setInterval(interval, 3600*1000);
+
+
 
 const nextApp = next({dev});
 const nextHandler = nextApp.getRequestHandler();

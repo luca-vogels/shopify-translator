@@ -21,11 +21,14 @@ const AI_SUPPORT = false; // TODO
 
 
 export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, fileContent, errorKey}){
+    const refDownload = useRef(null);
     const [csvState, setCsvState] = useState({});
     const [targetLang, setTargetLang] = useState("EN");
+    const [newFileName, setNewFileName] = useState(originalFileName || fileName);
 
     errorKey = (errorKey && csvState.progress === undefined) ? <b className={styles.error}>{TEXT[errorKey]}</b> : null;
     
+    // Process CSV
     useEffect(() => {
 
         // load from local storage
@@ -35,6 +38,8 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
                     lines: JSON.parse(localStorage.getItem("lines")),
                     progress: 1.0
                 });
+                originalFileName = localStorage.getItem("originalFileName") || fileName;
+                setNewFileName(originalFileName);
                 fileContent = undefined;
                 errorKey = null;
             } catch (ex){}
@@ -116,8 +121,8 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
 
 
 
-    const buildFileAndDownload = function(but){
-
+    const buildFileAndDownload = function(){
+        refDownload.current.setLoading(true);
     }
 
 
@@ -129,28 +134,34 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
             <h2>{TEXT['Settings']}</h2>
             {errorKey}
             <label>
-                {TEXT['TargetLanguage']}
+                <span>{TEXT['TargetLanguage']}</span>
                 <datalist id="language-codes">{
                     [   
                         'ab','aa','af','ak','sq','am','ar','an','hy','as','av','ae','ay','az','bm','ba','eu',
                         'be','bn','bh','bi','bs','br','bg','my','ca','ch','ce','ny','zh','zh-Hans','zh-Hant',
-                        'cv','	kw','co','cr','hr','cs','da','dv','nl','dz','en','eo','et','ee','fo','fj','fi',
+                        'cv','kw','co','cr','hr','cs','da','dv','nl','dz','en','eo','et','ee','fo','fj','fi',
                         'fr','ff','gl','gd','gv','ka','de','el','kl','gn','gu','ht','ha','he','hz','hi','ho',
-                        'hu','is','io','ig','id','in','ia','ie','iu','ik','ga','it','ja','jv','kl','kn','kr',
-                        'ks','kk','km','ki','rw','rn','ky','kv','kg','ko','ku','kj','lo','la','lv','li','ln',
-                        'lt','lu','lg','lb','gv','mk','mg','ms','ml','mt','mi','mr','mh','mo','mn','na','nv',
-                        'ng','nd','ne','no','nb','nn','ii','oc','oj','cu','or','om','os','pi','ps','fa','pl',
-                        'pt','pa','qu','rm','ro','ru','se','sm','sg','sa','sr','sh','st','tn','sn','ii','sd',
-                        'si','ss','sk','sl','so','nr','es','su','sw','ss','sv','tl','ty','tg','ta','tt','te',
-                        'th','bo','ti','to','ts','tr','tk','tw','ug','uk','ur','uz','ve','vi','vo','wa','cy',
-                        'wo','fy','xh','yi','ji','yo','za','zu'
-                    ].sort().map((str) => <option value={str.toUpperCase()}></option>)
+                        'hu','is','io','ig','id','in','ia','ie','iu','ik','ga','it','ja','jv','kn','kr','ks',
+                        'kk','km','ki','rw','rn','ky','kv','kg','ko','ku','kj','lo','la','lv','li','ln','lt',
+                        'lu','lg','lb','mk','mg','ms','ml','mt','mi','mr','mh','mo','mn','na','nv','ng','nd',
+                        'ne','no','nb','nn','ii','oc','oj','cu','or','om','os','pi','ps','fa','pl','pt','pa',
+                        'qu','rm','ro','ru','se','sm','sg','sa','sr','sh','st','tn','sn','sd','si','ss','sk',
+                        'sl','so','nr','es','su','sw','sv','tl','ty','tg','ta','tt','te','th','bo','ti','to',
+                        'ts','tr','tk','tw','ug','uk','ur','uz','ve','vi','vo','wa','cy','wo','fy','xh','yi',
+                        'ji','yo','za','zu'
+                    ].sort().map((str) => <option key={str} value={str.toUpperCase()}></option>)
                 }</datalist>
                 <input type="text" size="1" list="language-codes" value={targetLang} required onChange={(event) => {
                     setTargetLang(event.target.value.substring(0, 7).toUpperCase());
                 }} />
             </label>
-            <Button type="button" onClick={(event) => {buildFileAndDownload(event.target)}}>{TEXT['Download']}</Button>
+            <label>
+                <span>{TEXT['NewFileName']}</span>
+                <input type="text" value={newFileName} required onChange={(event) => {
+                    setNewFileName(event.target.value);
+                }} />
+            </label>
+            <Button ref={refDownload} type="button" onClick={buildFileAndDownload}>{TEXT['Download']}</Button>
         </>
 
     ) : ( csvState.progress !== undefined ? (
@@ -211,12 +222,12 @@ export async function getServerSideProps(context){
     
 
     const fileName = (context.query && context.query.args && context.query.args.length > 0) ? context.query.args.join("/") : null;
-    const originalFileName = fileName ? Upload.getOriginalFileName(fileName) : null;
-    let fileContent = null, errorKey = null;
+    let originalFileName = null, fileContent = null, errorKey = null;
     if(fileName){
         try {
-            fileContent = await Upload.readFile(fileName);
-            if(!fileContent) errorKey = "ReuploadFile";
+            const info = await Upload.readFile(fileName);
+            if(!info) errorKey = "ReuploadFile";
+            else { originalFileName = info.originalFileName; fileContent = info.content; }
         } catch (ex){
             errorKey = "CouldNotParseCSV";
             Upload.deleteFile(fileName);

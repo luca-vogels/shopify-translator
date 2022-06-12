@@ -5,9 +5,9 @@ const app = Router();
 const upload = multer(Upload.MULTER_SETTINGS);
 
 
-app.post("/upload", upload.single("file"), (req: any, res) => {
-    Upload.handleFiles(req.file);
-    Upload.handleFiles(req.files);
+app.post("/upload", upload.single("file"), async(req: any, res) => {
+    await Upload.handleFiles(req.file);
+    await Upload.handleFiles(req.files);
     res.redirect(303, "/"+req.lang+"/"+(req.file ? req.file.filename : ""));
 });
 
