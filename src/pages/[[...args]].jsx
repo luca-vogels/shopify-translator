@@ -30,6 +30,8 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
     const [newFileName, setNewFileName] = useState(originalFileName || fileName);
     const [deleteTranslations, setDeleteTranslations] = useState(false);
 
+    const [resumeButton, setResumeButton] = useState(null);
+
     errorKey = (errorKey && csvState.progress === undefined) ? <b className={styles.error}>{TEXT[errorKey]}</b> : null;
     
 
@@ -137,7 +139,18 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
 
     // Process CSV
     useEffect(() => {
-
+        // upload form resume button
+        if(localStorage && localStorage.getItem("fileName")) setResumeButton(<>
+            <br />
+            <small>
+                <hr style={{display: "inline-block", width: "30px", margin: "0.2em"}} />
+                <b>{TEXT['or']}</b>
+                <hr style={{display: "inline-block", width: "30px", margin: "0.2em"}} />
+            </small>
+            <br />
+            <br />
+            <a href={localStorage.getItem("fileName")} style={{color: "inherit"}}>{TEXT['ResumeWorking']}</a>
+        </>);
 
         // load from local storage
         if(csvState.progress === undefined && fileName && localStorage && localStorage.getItem("fileName") === fileName){
@@ -294,6 +307,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
             <h2>{TEXT['UploadYourShopifyCSV']}</h2>
             <InputFile TEXT={TEXT} name="file" required={true} onChange={(event) => event.target.form.submit() } />
             <Button type="submit" style={{opacity: "0.0"}}>{TEXT['Upload']}</Button>
+            {resumeButton}
         </form>
     ));
 
@@ -327,9 +341,9 @@ export async function getServerSideProps(context){
     const translationKeys = new Set();
     [ // used translation keys
         'CouldNotParseCSV', 'Default', 'Delete', 'DeleteAllTranslations', 'Download', 'FileName', 
-        'HideAlreadyTranslatedFields', 'HideFieldsWithEmptyDefault',
+        'HideAlreadyTranslatedFields', 'HideFieldsWithEmptyDefault', 'or',
         'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 'PrefillTranslationWithDefault',
-        'ProcessingFile', 'ReuploadFile', 'Settings', 
+        'ProcessingFile', 'ResumeWorking', 'ReuploadFile', 'Settings', 
         'TargetLanguage', 'Translation', 'Upload', 'UploadYourShopifyCSV'
     ].forEach((value) => translationKeys.add(value));
 
