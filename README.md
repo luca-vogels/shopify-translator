@@ -3,6 +3,10 @@ Online editor for easier translating of Shopify language CSV files.
 
 **[shopify-translator.luca-vogels.com](https://shopify-translator.luca-vogels.com)**  
 
+This project is just a quick and dirty solution that fits my needs.  
+In my opinion it makes editing Shopify language CSV files easier than e.g. with Excel and I just wanted to share it with you guys.  
+Do what ever you want with it :)
+
 ## Use online version
 Simply open following link to use the online version:  
 [shopify-translator.luca-vogels.com](https://shopify-translator.luca-vogels.com)
