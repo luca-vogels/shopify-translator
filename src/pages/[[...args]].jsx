@@ -28,12 +28,13 @@ export default function Home({LANGUAGE_NAMES, TEXT, fileName, fileContent, error
     useEffect(() => {
 
         // load from local storage
-        if(csvState.progress === undefined && fileName && !fileContent && localStorage && localStorage.getItem("fileName") === fileName){
+        if(csvState.progress === undefined && fileName && localStorage && localStorage.getItem("fileName") === fileName){
             try {
                 setCsvState({
                     lines: JSON.parse(localStorage.getItem("lines")),
                     progress: 1.0
                 });
+                fileContent = undefined;
                 errorKey = null;
             } catch (ex){}
         }
@@ -64,7 +65,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, fileName, fileContent, error
     
             const minCols = Math.max(typeIdx, idIdx, fieldIdx, localeIdx, statusIdx, defaultIdx, translatedIdx)+1;
     
-            let currentTitle = null, currentHead = null, currentArr = [];
+            let currentTitle = null, currentArr = [];
     
             function pushComponent(c){
                 if(currentArr.length === 0) return;
@@ -88,7 +89,10 @@ export default function Home({LANGUAGE_NAMES, TEXT, fileName, fileContent, error
                     <div key={c}>
                         <b>{column[fieldIdx]}</b>
                         <div>
-                            <TextArea TEXT={TEXT} title={TEXT['Default']} butReset={true} butEdit={true} disabled>
+                            <TextArea TEXT={TEXT} title={TEXT['Default']} butReset={true} butEdit={true} disabled onBlur={(event) => {
+                                csvState.lines[c][defaultIdx] = event.target.value;
+                                if(localStorage) localStorage.setItem("lines", JSON.stringify(csvState.lines));
+                            }}>
                                 {column[defaultIdx]}
                             </TextArea>
                             <TextArea TEXT={TEXT} title={TEXT['Translation']} defaultValue={column[defaultIdx]} butReset={true} butAI={AI_SUPPORT}>

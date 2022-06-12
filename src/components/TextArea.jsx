@@ -6,17 +6,18 @@ const AI_NONE = 0;
 const AI_PROCESSING = 1;
 const AI_DONE = 2;
 
-export default function TextArea({TEXT, children: initialValue, defaultValue, name, title, disabled, butReset, butEdit, butAI}){
+export default function TextArea({TEXT, children: initialValue, defaultValue, name, title, disabled, butReset, butEdit, butAI, onChange, onBlur}){
     defaultValue = defaultValue || "";
     initialValue = initialValue || defaultValue;
     const [value, setValue] = useState(initialValue);
     const [readOnly, setReadOnly] = useState(disabled ? true : false);
     const [aiState, setAiState] = useState(AI_NONE);
 
-    const onChange = function(event){
+    const handleChange = function(event){
         if(readOnly) return;
         setValue(event.target.value);
         setAiState(AI_NONE);
+        if(onChange) onChange(event);
     }
 
     // Reset button
@@ -60,7 +61,7 @@ export default function TextArea({TEXT, children: initialValue, defaultValue, na
                 {editButton}
                 {aiButton}
             </div>
-            <textarea name={name} value={value} onChange={onChange} disabled={readOnly} />
+            <textarea name={name} value={value} onChange={handleChange}  onBlur={onBlur} disabled={readOnly} />
         </div>
     );
 }
