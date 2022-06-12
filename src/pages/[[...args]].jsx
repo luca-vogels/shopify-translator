@@ -23,9 +23,9 @@ const AI_SUPPORT = false; // TODO
 export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, fileContent, errorKey}){
     const refDownload = useRef(null);
     const [csvState, setCsvState] = useState({});
-    const [showAlready, setShowAlready] = useState(true);
-    const [showEmpty, setShowEmpty] = useState(true);
-    const [targetLang, setTargetLang] = useState("EN");
+    const [hideAlready, setHideAlready] = useState(false);
+    const [hideEmpty, setHideEmpty] = useState(false);
+    const [targetLang, setTargetLang] = useState("");
     const [newFileName, setNewFileName] = useState(originalFileName || fileName);
 
     errorKey = (errorKey && csvState.progress === undefined) ? <b className={styles.error}>{TEXT[errorKey]}</b> : null;
@@ -66,6 +66,12 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
             currentArr = [];
         }
 
+        // detect target language
+        if(targetLang.length === 0){
+            const column = csvState.lines[foundHeader];
+            if(localeIdx < column.length && column[localeIdx].length > 0) setTargetLang(column[localeIdx].toUpperCase());
+        }
+
         // iterate all lines except first one if header found
         for(let c=foundHeader; c < csvState.lines.length; c++){
             const column = csvState.lines[c]; while(column.length < minCols) column.push("");
@@ -77,8 +83,8 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
 
             // add field block to current title block
             const transEmpty = !column[translatedIdx] || column[translatedIdx].length === 0;
-            const hidden = (!showEmpty && transEmpty && (!column[defaultIdx] || column[defaultIdx].length === 0)) ||
-                            (!showAlready && !transEmpty);
+            const hidden = (hideEmpty && transEmpty && (!column[defaultIdx] || column[defaultIdx].length === 0)) ||
+                            (hideAlready && !transEmpty);
             currentArr.push(
                 <div key={c} hidden={hidden} style={hidden ? {display: "none"} : {}}>
                     <b>{column[fieldIdx]}</b>
@@ -86,14 +92,14 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
                         <TextArea TEXT={TEXT} title={TEXT['Default']} butReset={true} butEdit={true} disabled onBlur={(event) => {
                             csvState.lines[c][defaultIdx] = event.target.value;
                             if(localStorage) localStorage.setItem("lines", JSON.stringify(csvState.lines));
-                            if(!showEmpty && !event.isButtonPressed) updateLineElements();
+                            if(hideEmpty && !event.isButtonPressed) updateLineElements();
                         }}>
                             {column[defaultIdx]}
                         </TextArea>
                         <TextArea TEXT={TEXT} title={TEXT['Translation']} defaultValue={column[defaultIdx]} butReset={true} butAI={AI_SUPPORT} onBlur={(event) => {
                             csvState.lines[c][translatedIdx] = event.target.value;
                             if(localStorage) localStorage.setItem("lines", JSON.stringify(csvState.lines));
-                            if(!showAlready && !event.isButtonPressed) updateLineElements();
+                            if(hideAlready && !event.isButtonPressed) updateLineElements();
                         }}>
                             {column[translatedIdx]}
                         </TextArea>
@@ -160,15 +166,15 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
             {errorKey}
             <label style={{cursor: "pointer"}}>
                 <input type="checkbox" onChange={() => {
-                    const next = !showAlready; setShowAlready(next); showAlready=next; updateLineElements(); 
-                } } checked={showAlready} />
-                <span>{TEXT['ShowAlreadyTranslatedFields']}</span>
+                    const next = !hideAlready; setHideAlready(next); hideAlready=next; updateLineElements(); 
+                } } checked={hideAlready} />
+                <span>{TEXT['HideAlreadyTranslatedFields']}</span>
             </label>
             <label style={{cursor: "pointer"}}>
                 <input type="checkbox" onChange={() => { 
-                    const next = !showEmpty; setShowEmpty(next); showEmpty=next; updateLineElements();
-                 }} checked={showEmpty} />
-                <span>{TEXT['ShowFieldsWithEmptyDefault']}</span>
+                    const next = !hideEmpty; setHideEmpty(next); hideEmpty=next; updateLineElements();
+                 }} checked={hideEmpty} />
+                <span>{TEXT['HideFieldsWithEmptyDefault']}</span>
             </label>
             <br />
             <label>
@@ -250,8 +256,9 @@ export async function getServerSideProps(context){
 
     const translationKeys = new Set();
     [ // used translation keys
-        'CouldNotParseCSV', 'Default', 'Download', 'FileName', 'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 
-        'ProcessingFile', 'ReuploadFile', 'Settings', 'ShowAlreadyTranslatedFields', 'ShowFieldsWithEmptyDefault',
+        'CouldNotParseCSV', 'Default', 'Download', 'FileName', 'HideAlreadyTranslatedFields', 'HideFieldsWithEmptyDefault',
+        'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 
+        'ProcessingFile', 'ReuploadFile', 'Settings', 
         'TargetLanguage', 'Translation', 'Upload', 'UploadYourShopifyCSV'
     ].forEach((value) => translationKeys.add(value));
 
