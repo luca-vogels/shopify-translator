@@ -1,9 +1,22 @@
+import { useEffect, useRef } from "react";
 import LanguageSelector from "./LanguageSelector";
 import styles from "./Layout.module.css";
 
 export default function Layout({children, LANGUAGE_NAMES, TEXT}){
+    const refContainer = useRef(null);
+
+    const updateMinHeight = function(){
+        refContainer.current.style.minHeight = window.innerHeight+"px";
+    }
+
+    useEffect(() => {
+        window.removeEventListener("resize", updateMinHeight);
+        window.addEventListener("resize", updateMinHeight);
+        updateMinHeight();
+    });
+
     return (
-        <div className={styles.layout}>
+        <div ref={refContainer} className={styles.layout}>
             <header><a href="/" className="nodrag noselect"><h1>{TEXT['NAME']}</h1></a></header>
             <div className={styles.main}>
                 {children}
