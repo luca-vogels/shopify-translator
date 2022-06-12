@@ -7,6 +7,7 @@ import Upload from "../services/Upload.service";
 import TextArea from "../components/TextArea";
 import { useEffect, useRef, useState } from "react";
 import InputFile from "../components/InputFile";
+import Button from "../components/Button";
 
 const AI_SUPPORT = false; // TODO
 
@@ -19,7 +20,7 @@ const AI_SUPPORT = false; // TODO
 // TODO Button to hide all empty fields
 
 
-export default function Home({LANGUAGE_NAMES, TEXT, fileName, fileContent, errorKey}){
+export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, fileContent, errorKey}){
     const [csvState, setCsvState] = useState({});
     const [targetLang, setTargetLang] = useState("EN");
 
@@ -107,10 +108,17 @@ export default function Home({LANGUAGE_NAMES, TEXT, fileName, fileContent, error
             setCsvState({ progress: csvState.progress, lineElements });
             if(localStorage){
                 localStorage.setItem("fileName", fileName);
+                localStorage.setItem("originalFileName", originalFileName);
                 localStorage.setItem("lines", JSON.stringify(csvState.lines));
             }
         }
     });
+
+
+
+    const buildFileAndDownload = function(but){
+
+    }
 
 
     // Controlls
@@ -122,10 +130,27 @@ export default function Home({LANGUAGE_NAMES, TEXT, fileName, fileContent, error
             {errorKey}
             <label>
                 {TEXT['TargetLanguage']}
-                <input type="text" size="1" value={targetLang} onChange={(event) => {
-                    setTargetLang(event.target.value.substring(0, 2).toUpperCase());
+                <datalist id="language-codes">{
+                    [   
+                        'ab','aa','af','ak','sq','am','ar','an','hy','as','av','ae','ay','az','bm','ba','eu',
+                        'be','bn','bh','bi','bs','br','bg','my','ca','ch','ce','ny','zh','zh-Hans','zh-Hant',
+                        'cv','	kw','co','cr','hr','cs','da','dv','nl','dz','en','eo','et','ee','fo','fj','fi',
+                        'fr','ff','gl','gd','gv','ka','de','el','kl','gn','gu','ht','ha','he','hz','hi','ho',
+                        'hu','is','io','ig','id','in','ia','ie','iu','ik','ga','it','ja','jv','kl','kn','kr',
+                        'ks','kk','km','ki','rw','rn','ky','kv','kg','ko','ku','kj','lo','la','lv','li','ln',
+                        'lt','lu','lg','lb','gv','mk','mg','ms','ml','mt','mi','mr','mh','mo','mn','na','nv',
+                        'ng','nd','ne','no','nb','nn','ii','oc','oj','cu','or','om','os','pi','ps','fa','pl',
+                        'pt','pa','qu','rm','ro','ru','se','sm','sg','sa','sr','sh','st','tn','sn','ii','sd',
+                        'si','ss','sk','sl','so','nr','es','su','sw','ss','sv','tl','ty','tg','ta','tt','te',
+                        'th','bo','ti','to','ts','tr','tk','tw','ug','uk','ur','uz','ve','vi','vo','wa','cy',
+                        'wo','fy','xh','yi','ji','yo','za','zu'
+                    ].sort().map((str) => <option value={str.toUpperCase()}></option>)
+                }</datalist>
+                <input type="text" size="1" list="language-codes" value={targetLang} required onChange={(event) => {
+                    setTargetLang(event.target.value.substring(0, 7).toUpperCase());
                 }} />
             </label>
+            <Button type="button" onClick={(event) => {buildFileAndDownload(event.target)}}>{TEXT['Download']}</Button>
         </>
 
     ) : ( csvState.progress !== undefined ? (
@@ -143,7 +168,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, fileName, fileContent, error
             {errorKey}
             <h2>{TEXT['UploadYourShopifyCSV']}</h2>
             <InputFile TEXT={TEXT} name="file" required={true} onChange={(event) => event.target.form.submit() } />
-            <button type="submit" style={{opacity: "0.0"}}>{TEXT['Upload']}</button>
+            <Button type="submit" style={{opacity: "0.0"}}>{TEXT['Upload']}</Button>
         </form>
     ));
 
@@ -176,16 +201,17 @@ export async function getServerSideProps(context){
 
     const translationKeys = new Set();
     [ // used translation keys
-        'CouldNotParseCSV', 'Default', 'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 'ProcessingFile',
+        'CouldNotParseCSV', 'Default', 'Download', 'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 'ProcessingFile',
         'ReuploadFile', 'Settings', 'TargetLanguage', 'Translation', 'Upload', 'UploadYourShopifyCSV'
     ].forEach((value) => translationKeys.add(value));
 
     [ // used components
-        InputFile, Layout, Metadata, TextArea
+        Button, InputFile, Layout, Metadata, TextArea
     ].forEach((component) => component.addTranslationKeys(translationKeys));
     
 
     const fileName = (context.query && context.query.args && context.query.args.length > 0) ? context.query.args.join("/") : null;
+    const originalFileName = fileName ? Upload.getOriginalFileName(fileName) : null;
     let fileContent = null, errorKey = null;
     if(fileName){
         try {
@@ -202,6 +228,7 @@ export async function getServerSideProps(context){
         props: {
             LANGUAGE_NAMES: await getLanguageNames(),
             TEXT,
+            originalFileName,
             fileName,
             fileContent,
             errorKey

@@ -34,6 +34,9 @@ export function init(){
 
 export function handleFiles(file: any[] | any){
     if(!file) return;
+
+    console.log(file); // TODO REMOVE
+
     const files = (file instanceof Array) ? file : [file];
 
     while(FILES.length + files.length > MAX_FILES){
@@ -51,9 +54,17 @@ export function handleFiles(file: any[] | any){
 
 export function deleteFile(fileName: string){
     fs.unlink(path.resolve(DIRECTORY, fileName), (err) => { if(err) console.error(err); });
-    FILES.forEach((file, idx) => {
-        if(file.filename === fileName) FILES = FILES.splice(idx, 1);
-    });
+    for(let i=0; i < FILES.length; i++)
+        if(FILES[i].filename === fileName) FILES = FILES.splice(i, 1);
+}
+
+
+export function getOriginalFileName(fileName: string): string | null {
+    for(let i=0; i < FILES.length; i++){
+        const file = FILES[i];
+        if(file.filename === fileName) return file.originalname;
+    }
+    return null;
 }
 
 
@@ -75,5 +86,6 @@ export default {
     init,
     handleFiles,
     deleteFile,
+    getOriginalFileName,
     readFile
 }

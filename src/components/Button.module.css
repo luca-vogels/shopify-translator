@@ -1,0 +1,21 @@
+.button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    border-width: 1px;
+    outline: none;
+
+    cursor: pointer;
+}
+
+.loading {
+    color: transparent;
+    background-image: url(/images/content/icons/loading.gif);
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.loading img {
+    display: none;
+}
