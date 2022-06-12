@@ -45,10 +45,21 @@
     padding-right: 0.5em;
 }
 
-.controlls > .settings button {
+.controlls > .settings > button {
     margin: 1.5em 0px 0px;
     padding: 0.2em 0.5em;
     font-size: 1.05rem;
+}
+.controlls > .settings small {
+    width: 100%;
+}
+.controlls > .settings small button {
+    color: var(--color-critical);
+    font-size: 85%;
+    border-width: 1px;
+    border-color: var(--color-critical);
+    outline: none;
+    cursor: pointer;
 }
 
 

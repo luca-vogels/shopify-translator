@@ -16,6 +16,8 @@ export default function TextArea({TEXT, children: initialValue, defaultValue, na
     const [aiState, setAiState] = useState(AI_NONE);
     let isButtonPressed = false;
 
+    if(value !== initialValue) setValue(initialValue); // needed to change state on rerender
+
     const handleChange = function(event){
         if(readOnly) return;
         setValue(event.target.value);

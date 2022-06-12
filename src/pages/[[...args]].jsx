@@ -25,13 +25,16 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
     const [csvState, setCsvState] = useState({});
     const [hideAlready, setHideAlready] = useState(false);
     const [hideEmpty, setHideEmpty] = useState(false);
+    const [prefillTranslation, setPrefillTranslation] = useState(true);
     const [targetLang, setTargetLang] = useState("");
     const [newFileName, setNewFileName] = useState(originalFileName || fileName);
+    const [deleteTranslations, setDeleteTranslations] = useState(false);
 
     errorKey = (errorKey && csvState.progress === undefined) ? <b className={styles.error}>{TEXT[errorKey]}</b> : null;
     
 
-    const updateLineElements = function(){
+    // Updates the list of editable entries
+    const updateLineElements = function(updateLocalStorage=false){
         const lineElements = [];
         let typeIdx = 0, idIdx = 1, fieldIdx = 2, localeIdx = 3, statusIdx = 5, defaultIdx = 6, translatedIdx = 7, foundHeader=0;
 
@@ -75,6 +78,7 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
         // iterate all lines except first one if header found
         for(let c=foundHeader; c < csvState.lines.length; c++){
             const column = csvState.lines[c]; while(column.length < minCols) column.push("");
+            if(deleteTranslations) column[translatedIdx] = "";
 
             const titleKey = column[typeIdx]+"-"+column[idIdx];
             if(titleKey !== currentTitleKey){ pushComponent(c); }
@@ -96,10 +100,12 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
                         }}>
                             {column[defaultIdx]}
                         </TextArea>
-                        <TextArea TEXT={TEXT} title={TEXT['Translation']} defaultValue={column[defaultIdx]} butReset={true} butAI={AI_SUPPORT} onBlur={(event) => {
-                            csvState.lines[c][translatedIdx] = event.target.value;
-                            if(localStorage) localStorage.setItem("lines", JSON.stringify(csvState.lines));
-                            if(hideAlready && !event.isButtonPressed) updateLineElements();
+                        <TextArea TEXT={TEXT} title={TEXT['Translation']} defaultValue={(deleteTranslations || !prefillTranslation) ? "" : column[defaultIdx]} 
+                            butReset={true} butAI={AI_SUPPORT} 
+                            onBlur={(event) => {
+                                csvState.lines[c][translatedIdx] = event.target.value;
+                                if(localStorage) localStorage.setItem("lines", JSON.stringify(csvState.lines));
+                                if(hideAlready && !event.isButtonPressed) updateLineElements();
                         }}>
                             {column[translatedIdx]}
                         </TextArea>
@@ -109,7 +115,22 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
         }
         pushComponent(csvState.lines.length);
 
-        setCsvState({ progress: csvState.progress, lineElements, lines: csvState.lines });
+        setCsvState({
+            progress: csvState.progress,
+            header: {
+                found: foundHeader === 1 ? true : false,
+                localeIdx
+            },
+            lines: csvState.lines,
+            lineElements, 
+        });
+        setDeleteTranslations(false);
+
+        if(updateLocalStorage && localStorage){
+            if(fileName) localStorage.setItem("fileName", fileName);
+            if(originalFileName) localStorage.setItem("originalFileName", originalFileName);
+            if(csvState.lines) localStorage.setItem("lines", JSON.stringify(csvState.lines));
+        }
     }
 
 
@@ -141,19 +162,53 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
 
         // render lines
         if(csvState.lines && csvState.lineElements === undefined){
-            updateLineElements();
-            if(localStorage){
-                if(fileName) localStorage.setItem("fileName", fileName);
-                if(originalFileName) localStorage.setItem("originalFileName", originalFileName);
-                if(csvState.lines) localStorage.setItem("lines", JSON.stringify(csvState.lines));
-            }
+            updateLineElements(true);
         }
     });
 
 
-
+    // Builds new CSV file and downloads it
     const buildFileAndDownload = function(){
         refDownload.current.setLoading(true);
+        setTimeout(() => {
+
+            let content = "";
+            if(csvState.lines){
+                const foundHeader = csvState.header.found ? 1 : 0;
+                const localeIdx = csvState.header.localeIdx;
+                const tl = targetLang.toLowerCase();
+
+                // append header as read
+                if(foundHeader) content += csvState.lines[0].join(",")+"\n";
+
+                // iterate data rows
+                for(let i=foundHeader; i < csvState.lines.length; i++){
+                    const column = csvState.lines[i];
+                    if(!column) continue;
+
+                    for(let j=0; j < column.length; j++){
+                        if(j === localeIdx){ content += (j===0 ? '' : ',')+tl; continue; }
+                        const col = column[j];
+                        const useQuotes = (col.indexOf('"') >= 0 || col.indexOf("\n") >= 0 || col.indexOf(",") >= 0);
+                        content += (j===0 ? '' : ',') + (useQuotes ? '"'+col.replaceAll('"', '""')+'"' : col);
+                    }
+
+                    content += "\n";
+                }
+            }
+            
+            // Create file
+            const doc = document.createElement("a");
+            doc.style.display = "none";
+            doc.setAttribute("download", newFileName);
+            doc.setAttribute("href", "data:text/csv;charset=utf-8,"+encodeURIComponent(content));
+            document.body.appendChild(doc);
+            doc.click();
+            document.body.removeChild(doc);
+
+            refDownload.current.setLoading(false);
+
+        }, 0);
     }
 
 
@@ -176,6 +231,21 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
                  }} checked={hideEmpty} />
                 <span>{TEXT['HideFieldsWithEmptyDefault']}</span>
             </label>
+            <label style={{cursor: "pointer"}}>
+                <input type="checkbox" onChange={() => { 
+                    const next = !prefillTranslation; setPrefillTranslation(next); prefillTranslation=next; updateLineElements();
+                 }} checked={prefillTranslation} />
+                <span>{TEXT['PrefillTranslationWithDefault']}</span>
+            </label>
+            <br />
+            <small><label>
+                <span>{TEXT['DeleteAllTranslations']}</span>
+                <Button type="button" disabled={deleteTranslations} onClick={() => {
+                    setDeleteTranslations(true);
+                    deleteTranslations = true;
+                    updateLineElements(true);
+                }}>{TEXT['Delete']}</Button>
+            </label></small>
             <br />
             <label>
                 <span>{TEXT['TargetLanguage']}:</span>
@@ -256,8 +326,9 @@ export async function getServerSideProps(context){
 
     const translationKeys = new Set();
     [ // used translation keys
-        'CouldNotParseCSV', 'Default', 'Download', 'FileName', 'HideAlreadyTranslatedFields', 'HideFieldsWithEmptyDefault',
-        'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 
+        'CouldNotParseCSV', 'Default', 'Delete', 'DeleteAllTranslations', 'Download', 'FileName', 
+        'HideAlreadyTranslatedFields', 'HideFieldsWithEmptyDefault',
+        'pageDescriptionHome', 'pageKeywordsHome', 'pageLongTitleHome', 'PrefillTranslationWithDefault',
         'ProcessingFile', 'ReuploadFile', 'Settings', 
         'TargetLanguage', 'Translation', 'Upload', 'UploadYourShopifyCSV'
     ].forEach((value) => translationKeys.add(value));
