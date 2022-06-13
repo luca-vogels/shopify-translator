@@ -1,90 +1,131 @@
-import { useRef, useState } from "react";
 import styles from "./TextArea.module.css";
 import DeepL from "../services/DeepL.service";
 import Button from "./Button";
+import React from "react";
 
 const AI_NONE = 0;
 const AI_PROCESSING = 1;
 const AI_DONE = 2;
 
-export default function TextArea({TEXT, children: initialValue, defaultValue, name, title, disabled, butReset, butEdit, butAI, onChange, onBlur}){
-    defaultValue = defaultValue || "";
-    initialValue = initialValue || defaultValue;
-    const refAiBut = useRef(null);
-    const [value, setValue] = useState(initialValue);
-    const [readOnly, setReadOnly] = useState(disabled ? true : false);
-    const [aiState, setAiState] = useState(AI_NONE);
-    let isButtonPressed = false;
+class TextArea extends React.Component {
+    #refAiBut = React.createRef();
+    #gotChanged = false;
 
-    if(value !== initialValue) setValue(initialValue); // needed to change state on rerender
+    constructor(props){
+        super(props);
 
-    const handleChange = function(event){
-        if(readOnly) return;
-        setValue(event.target.value);
-        setAiState(AI_NONE);
-        if(onChange) onChange(event);
+        this.state = {
+            initialValue: props.initialValue !== undefined ?  props.initialValue : props.children || "",
+            value: props.value !== undefined ? column[defaultIdx] : props.initialValue || props.children || "",
+            disabled: props.disabled ? true : false,
+            aiState: AI_NONE
+        };
     }
-
-    const handleBlur = function(event){
-        setTimeout(() => {
-            event.isButtonPressed = isButtonPressed;
-            onBlur(event);
-        }, 100);
-    }
-
-    // Reset button
-    const resetButton = (butReset && value !== initialValue) ? (
-        <Button type="button" title={TEXT['ResetToDefault']} disabled={readOnly} onClick={(event) => {
-            isButtonPressed = true;
-            setValue(initialValue);
-        }}>
-            <img src="/images/content/icons/reset.svg" width="100%" height="100%" draggable={false} alt={TEXT['ResetToDefault']} />
-        </Button>
-    ) : null;
-
-    // Edit / Lock button
-    const editButton = butEdit ? (
-        <Button type="button" title={TEXT[readOnly ? 'Edit' : 'Lock']} onClick={(event) => {
-            setReadOnly(!readOnly);
-        }}>
-            <img src={"/images/content/icons/"+(readOnly ? "edit" : "lock")+".svg"} width="100%" height="100%" 
-                    draggable={false} alt={TEXT[readOnly ? 'Edit' : 'Lock']} />
-        </Button>
-    ) : null;
     
-    const aiButton = butAI ? (
-        <Button ref={refAiBut} disabled={aiState !== AI_NONE} type="button" title={TEXT['Auto']} onClick={(event) => {
-            if(aiState === AI_NONE){
-                setAiState(AI_PROCESSING);
-                refAiBut.current.setLoading(true);
-                DeepL.translate("auto", "de", value, (_, translation) => {
-                    if(translation) setValue(translation);
-                    setAiState(AI_DONE);
-                    refAiBut.current.setLoading(false);
-                });
-            }
-        }}>{TEXT['Auto']}</Button>
-    ) : null;
+    #handleChange(event){
+        if(this.state.disabled) return;
+        this.#gotChanged = true;
+        const newState = {...this.state, value: event.target.value, aiState: AI_NONE};
+        this.setState(newState)
+        if(this.props.onChange) this.props.onChange(event);
+    }
 
-    return (
-        <div className={styles.container}>
-            <div>
-                <b>{title}</b>
-                {resetButton}
-                {editButton}
-                {aiButton}
+    gotChanged(){
+        return this.#gotChanged;
+    }
+
+    set(value, initialValue){
+        this.#gotChanged = false;
+        const newState = {...this.state, value, initialValue};
+        this.setState(newState);
+    }
+
+    setInitialValue(initialValue){
+        const newState = {...this.state, initialValue};
+        this.setState(newState);
+    }
+
+    setValue(value){
+        this.#gotChanged = false;
+        const newState = {...this.state, value};
+        this.setState(newState);
+    }
+
+    getValue(){
+        return this.state.value;
+    }
+
+    setReadOnly(readOnly=true){
+        const newState = {...this.state, disabled: readOnly};
+        this.setState(newState);
+    }
+
+    #setAiState(aiState){
+        const newState = {...this.state, aiState};
+        this.setState(newState);
+    }
+
+    render(){
+
+        // Reset button
+        const resetButton = (this.props.butReset && this.state.value !== this.state.initialValue) ? (
+            <Button type="button" title={this.props.TEXT['ResetToDefault']} disabled={this.state.disabled} onClick={(event) => {
+                this.setValue(this.state.initialValue);
+            }}>
+                <img src="/images/content/icons/reset.svg" width="100%" height="100%" draggable={false} alt={this.props.TEXT['ResetToDefault']} />
+            </Button>
+        ) : null;
+
+        // Edit / Lock button
+        const editButton = this.props.butEdit ? (
+            <Button type="button" title={this.props.TEXT[this.state.disabled ? 'Edit' : 'Lock']} onClick={(event) => {
+                this.setReadOnly(!this.state.disabled);
+            }}>
+                <img src={"/images/content/icons/"+(this.state.disabled ? "edit" : "lock")+".svg"} width="100%" height="100%" 
+                        draggable={false} alt={this.props.TEXT[this.state.disabled ? 'Edit' : 'Lock']} />
+            </Button>
+        ) : null;
+        
+        const aiButton = this.props.butAI ? (
+            <Button ref={this.#refAiBut} disabled={this.state.aiState !== AI_NONE} type="button" title={this.props.TEXT['Auto']} 
+            onClick={(event) => {
+                if(this.state.aiState === AI_NONE){
+                    this.#setAiState(AI_PROCESSING);
+                    this.#refAiBut.current.setLoading(true);
+                    DeepL.translate("auto", "de", this.state.value, (_, translation) => {
+                        if(translation) this.setValue(translation);
+                        this.#setAiState(AI_DONE);
+                        this.#refAiBut.current.setLoading(false);
+                    });
+                }
+            }}>{this.props.TEXT['Auto']}</Button>
+        ) : null;
+
+        return (
+            <div className={styles.container}>
+                <div>
+                    <b>{this.props.title}</b>
+                    {resetButton}
+                    {editButton}
+                    {aiButton}
+                </div>
+                <textarea name={this.props.name} value={this.state.value} 
+                            disabled={this.state.disabled}
+                            onChange={(event) => this.#handleChange(event)} onBlur={this.props.onBlur} />
             </div>
-            <textarea name={name} value={value} onChange={handleChange} onBlur={handleBlur} disabled={readOnly} />
-        </div>
-    );
+        );
+    }
+
+
+    static addTranslationKeys = function(set){
+        [ // used translation keys
+            'Auto', 'Edit', 'Lock', 'ResetToDefault'
+        ].forEach((value) => set.add(value));
+    
+        [ // used components
+            Button
+        ].forEach((component) => component.addTranslationKeys(set));
+    }
 }
 
-TextArea.addTranslationKeys = function(set){
-    [ // used translation keys
-        'Auto', 'Edit', 'Lock', 'ResetToDefault'
-    ].forEach((value) => set.add(value));
-
-    [ // used components
-        Button
-    ].forEach((component) => component.addTranslationKeys(set));
-}
+export default TextArea;
