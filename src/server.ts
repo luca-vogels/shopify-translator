@@ -29,11 +29,14 @@ nextApp.prepare().then(async function(){
     const app = express();
 
     // middleware
-    app.use(await LanguageRouter({
+    const languageHandler = LanguageRouter({
         useNextConfigLanguages: true,
         loadTranslations: false,
         redirectRoot: true
-    }));
+    });
+    await languageHandler.preload();
+    app.use(languageHandler);
+
     app.use(express.urlencoded({ extended: true }));
 
     // all api routes
