@@ -242,11 +242,12 @@ export default function Home({LANGUAGE_NAMES, TEXT, originalFileName, fileName, 
                 const defaultComp = defaultRefs[i];
                 const translationComp = translationRefs[i];
                 const hide = (
-                    (filters.hideAlready && translationComp && translationComp.current && translationComp.current.gotChanged()) ||
+                    (filters.hideAlready && translationComp && translationComp.current && translationComp.current.gotChanged()
+                        && translationComp.current.getValue()) ||
                     (filters.hideEmpty && defaultComp && defaultComp.current && !defaultComp.current.getValue())
                 );
                 if(subContainer && subContainer.current)
-                    subContainer.current.style.display = hide ? "none" : null;
+                    subContainer.current.style.display = hide ? "none" : "";
                 hiddenCount += hide ? 1 : 0;
                 if(first){
                     first = false;
