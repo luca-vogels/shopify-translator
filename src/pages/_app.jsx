@@ -1,5 +1,5 @@
 import '../styles/globals.css';
 
-export default function LupAuth({Component, pageProps}) {
+export default function ShopifyTranslator({Component, pageProps}) {
     return <Component {...pageProps}></Component>
 }
